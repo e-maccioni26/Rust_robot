@@ -1,3 +1,8 @@
+mod map;
+
+use map::Map;
+
 fn main() {
-    println!("Hello, world!");
+    let map = Map::new(20, 10, 42);
+    map.display();
 }
