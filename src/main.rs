@@ -1,7 +1,7 @@
 mod map;
 mod robot;
 mod simulation;
-mod station; 
+mod station;
 
 use map::Map;
 use simulation::start_simulation;
