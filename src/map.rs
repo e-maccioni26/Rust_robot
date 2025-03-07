@@ -66,7 +66,6 @@ mod tests {
 
     #[test]
     fn test_map_reproducibility() {
-        // Deux cartes générées avec la même seed doivent être identiques
         let map1 = Map::new(10, 10, 123);
         let map2 = Map::new(10, 10, 123);
         assert_eq!(map1.cells, map2.cells, "Les cartes doivent être identiques pour la même seed");

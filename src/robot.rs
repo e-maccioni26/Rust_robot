@@ -44,6 +44,5 @@ mod tests {
         let robot = Robot::new(1, RobotType::Explorer, (0, 0));
         assert_eq!(robot.id, 1);
         assert_eq!(robot.position, (0, 0));
-        // Vous pouvez ajouter d'autres assertions si vous ajoutez d'autres champs
     }
 }
