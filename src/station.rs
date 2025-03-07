@@ -79,3 +79,29 @@ pub fn run_station(rx: Receiver<RobotMessage>, cmd_tx: Sender<StationCommand>) {
     }
     println!("Station fermée. État final : {:?}", station);
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::mpsc;
+    use crate::simulation::{RobotMessage, ResourceType};
+    use crate::robot::RobotType;
+
+    #[test]
+    fn test_station_update_and_production() {
+        // Créer un canal factice pour pouvoir passer le sender à handle_message.
+        let (cmd_tx, _cmd_rx) = mpsc::channel();
+
+        let mut station = Station::new();
+        // Envoyer un message de mise à jour de position
+        station.handle_message(RobotMessage::Update(1, "Position: (1, 1)".to_string()), &cmd_tx);
+        assert_eq!(station.known_positions.len(), 1, "La station doit enregistrer la position du robot");
+
+        // Envoyer un message indiquant la collecte d'énergie
+        station.handle_message(RobotMessage::ResourceCollected(1, ResourceType::Energy, 2), &cmd_tx);
+        // Après collecte de 2 unités d'énergie, le coût de production (2) est déduit,
+        // donc l'énergie collectée devrait redevenir 0.
+        assert_eq!(station.energy_collected, 0, "L'énergie doit être déduite après production");
+    }
+}
