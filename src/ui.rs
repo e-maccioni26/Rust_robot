@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::ui::Size;
 use crate::game::StationState;
 
 #[derive(Component)]
@@ -23,7 +24,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                         text: Text::from_section(
                             "Station: Energy=0, Minerals=0",
                             TextStyle {
-                                font: asset_server.load("fonts/FiraSans-Bold.ttf"), 
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
                                 font_size: 20.0,
                                 color: Color::WHITE,
                             },

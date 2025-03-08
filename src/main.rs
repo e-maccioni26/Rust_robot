@@ -4,19 +4,36 @@ mod simulation;
 mod station;
 mod gui;
 mod bridge;
+mod game;  
+mod ui;
 
 use bevy::prelude::*;
 use gui::{setup_map, spawn_robots, move_robots};
 use bridge::SimulationChannels;
 use simulation::{start_simulation, RobotMessage, StationCommand};
+use game::{spawn_resources, check_collection, StationState}; 
+use ui::{setup_ui, update_ui};   
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (setup_map, spawn_robots, setup_simulation))
-        .add_systems(Update, (move_robots, receive_simulation_msgs))
+        .insert_resource(StationState::default())
+        .add_systems(Startup, (
+            setup_map,
+            spawn_robots,
+            spawn_resources,
+            setup_ui,
+            setup_simulation,
+        ))
+        .add_systems(Update, (
+            move_robots,
+            check_collection,
+            update_ui,
+            receive_simulation_msgs,
+        ))
         .run();
 }
+
 
 fn setup_simulation(mut commands: Commands) {
     use crossbeam::channel;
