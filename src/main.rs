@@ -50,8 +50,27 @@ fn setup_simulation(mut commands: Commands) {
     });
 }
 
-fn receive_simulation_msgs(mut channels: ResMut<SimulationChannels>) {
+fn receive_simulation_msgs(
+    mut channels: ResMut<SimulationChannels>,
+    mut robot_query: Query<&mut RobotSprite>,
+) {
     while let Ok(msg) = channels.rx_robot_msgs.try_recv() {
-        println!("Bevy a reçu un message : {:?}", msg);
+        match msg {
+            RobotMessage::Update(robot_id, desc) => {
+                println!("Bevy reçoit un update du robot {}: {}", robot_id, desc);
+                if let Some(pos_str) = desc.strip_prefix("Position: ") {
+                    if let Ok(pos_x) = pos_str.parse::<f32>() {
+                        for mut sprite in robot_query.iter_mut() {
+                            if sprite.id == robot_id {
+                                sprite.x = pos_x;
+                            }
+                        }
+                    }
+                }
+            }
+            RobotMessage::ResourceCollected(robot_id, resource, amount) => {
+                println!("Bevy: Robot {} a collecté {:?} (x{})", robot_id, resource, amount);
+            }
+        }
     }
 }
