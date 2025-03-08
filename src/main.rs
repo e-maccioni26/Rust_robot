@@ -6,7 +6,7 @@ mod station;
 mod gui;
 
 use bevy::prelude::*;
-use gui::{setup, update_map};
+use gui::{setup_map, spawn_robots, move_robots};
 
 fn main() {
     App::new()
@@ -18,7 +18,11 @@ fn main() {
             }),
             ..default()
         }))
-        .add_systems(Startup, setup)
-        .add_systems(Update, update_map)
+        // On lance d'abord la création de la carte
+        .add_systems(Startup, setup_map)
+        // Puis on spawn nos robots
+        .add_systems(Startup, spawn_robots)
+        // À chaque frame, on déplace nos robots
+        .add_systems(Update, move_robots)
         .run();
 }
