@@ -6,6 +6,9 @@ pub struct SimulationMap {
     pub map: Map,
 }
 
+#[derive(Resource)]
+pub struct SelectedRobot(pub u32);
+
 #[derive(Component)]
 pub struct MapCell;
 
@@ -103,29 +106,43 @@ pub fn move_robots(
 
 pub fn robot_input_system(
     keyboard_input: Res<Input<KeyCode>>,
+    mut selected: ResMut<SelectedRobot>,
     mut query: Query<&mut RobotSprite>,
 ) {
-   
-    let mut direction = Vec2::ZERO;
-
-    if keyboard_input.pressed(KeyCode::Up) {
-        direction.y += 1.0;
+    if keyboard_input.just_pressed(KeyCode::Key1) {
+        selected.0 = 1;
+        println!("Robot sélectionné = 1");
     }
-    if keyboard_input.pressed(KeyCode::Down) {
-        direction.y -= 1.0;
-    }
-    if keyboard_input.pressed(KeyCode::Left) {
-        direction.x -= 1.0;
-    }
-    if keyboard_input.pressed(KeyCode::Right) {
-        direction.x += 1.0;
+    if keyboard_input.just_pressed(KeyCode::Key2) {
+        selected.0 = 2;
+        println!("Robot sélectionné = 2");
     }
 
-    
-    if direction != Vec2::ZERO {
+
+    let mut dx = 0.0;
+    let mut dy = 0.0;
+
+    if keyboard_input.just_pressed(KeyCode::Up) {
+        dy += 1.0;
+    }
+    if keyboard_input.just_pressed(KeyCode::Down) {
+        dy -= 1.0;
+    }
+    if keyboard_input.just_pressed(KeyCode::Left) {
+        dx -= 1.0;
+    }
+    if keyboard_input.just_pressed(KeyCode::Right) {
+        dx += 1.0;
+    }
+
+    if dx != 0.0 || dy != 0.0 {
         for mut robot in query.iter_mut() {
-            robot.x += direction.x;
-            robot.y += direction.y;
+            if robot.id == selected.0 {
+                robot.x += dx;
+                robot.y += dy;
+                
+                println!("Robot {} se déplace en x={}, y={}", robot.id, robot.x, robot.y);
+            }
         }
     }
-}   
+}
