@@ -24,7 +24,6 @@ pub enum StationCommand {
 }
 
 pub fn start_simulation(tx_robot_msg: Sender<RobotMessage>, rx_station_cmd: Receiver<StationCommand>) {
-    // Ex. un petit robot qui bouge 5 fois
     let mut rng = rand::thread_rng();
     for i in 0..5 {
         tx_robot_msg.send(RobotMessage::Update(1, format!("Position: {}", i))).ok();
@@ -34,6 +33,5 @@ pub fn start_simulation(tx_robot_msg: Sender<RobotMessage>, rx_station_cmd: Rece
         thread::sleep(Duration::from_millis(500));
     }
 
-    // Lire éventuellement rx_station_cmd ici
     println!("Fin de la simulation concurrente.");
 }

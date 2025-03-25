@@ -88,19 +88,44 @@ pub fn spawn_robots(mut commands: Commands) {
 }
 
 pub fn move_robots(
-    mut query: Query<(&mut RobotSprite, &mut Transform)>,
+    mut query: Query<(&RobotSprite, &mut Transform)>,
     time: Res<Time>,
 ) {
-    let speed = 1.0;
     let cell_size = 20.0;
-
-    for (mut robot, mut transform) in query.iter_mut() {
-        robot.x += speed * time.delta_seconds();
-
+    for (robot, mut transform) in query.iter_mut() {
         let pos_x = robot.x * cell_size - (20.0 * cell_size) / 2.0 + cell_size / 2.0;
         let pos_y = robot.y * cell_size - (10.0 * cell_size) / 2.0 + cell_size / 2.0;
-
         transform.translation.x = pos_x;
         transform.translation.y = pos_y;
     }
 }
+
+
+pub fn robot_input_system(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut query: Query<&mut RobotSprite>,
+) {
+   
+    let mut direction = Vec2::ZERO;
+
+    if keyboard_input.pressed(KeyCode::Up) {
+        direction.y += 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::Down) {
+        direction.y -= 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::Left) {
+        direction.x -= 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::Right) {
+        direction.x += 1.0;
+    }
+
+    
+    if direction != Vec2::ZERO {
+        for mut robot in query.iter_mut() {
+            robot.x += direction.x;
+            robot.y += direction.y;
+        }
+    }
+}   
