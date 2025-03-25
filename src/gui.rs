@@ -75,7 +75,7 @@ pub fn spawn_robots(mut commands: Commands) {
                     ..Default::default()
                 },
                 transform: Transform {
-                    translation: Vec3::new(pos_x, pos_y, 1.0), 
+                    translation: Vec3::new(pos_x, pos_y, 1.0),
                     ..Default::default()
                 },
                 ..Default::default()
@@ -92,7 +92,6 @@ pub fn spawn_robots(mut commands: Commands) {
 
 pub fn move_robots(
     mut query: Query<(&RobotSprite, &mut Transform)>,
-    time: Res<Time>,
 ) {
     let cell_size = 20.0;
     for (robot, mut transform) in query.iter_mut() {
@@ -108,7 +107,9 @@ pub fn robot_input_system(
     keyboard_input: Res<Input<KeyCode>>,
     mut selected: ResMut<SelectedRobot>,
     mut query: Query<&mut RobotSprite>,
+    sim_map: Res<SimulationMap>,
 ) {
+
     if keyboard_input.just_pressed(KeyCode::Key1) {
         selected.0 = 1;
         println!("Robot sélectionné = 1");
@@ -118,30 +119,39 @@ pub fn robot_input_system(
         println!("Robot sélectionné = 2");
     }
 
-
     let mut dx = 0.0;
     let mut dy = 0.0;
-
     if keyboard_input.just_pressed(KeyCode::Up) {
-        dy += 1.0;
+        dy = 1.0;
     }
     if keyboard_input.just_pressed(KeyCode::Down) {
-        dy -= 1.0;
+        dy = -1.0;
     }
     if keyboard_input.just_pressed(KeyCode::Left) {
-        dx -= 1.0;
+        dx = -1.0;
     }
     if keyboard_input.just_pressed(KeyCode::Right) {
-        dx += 1.0;
+        dx = 1.0;
     }
 
+    
     if dx != 0.0 || dy != 0.0 {
         for mut robot in query.iter_mut() {
             if robot.id == selected.0 {
-                robot.x += dx;
-                robot.y += dy;
-                
-                println!("Robot {} se déplace en x={}, y={}", robot.id, robot.x, robot.y);
+                let new_x = robot.x + dx;
+                let new_y = robot.y + dy;
+                if new_x < 0.0 || new_y < 0.0 || (new_x as usize) >= sim_map.map.width || (new_y as usize) >= sim_map.map.height {
+                    println!("Déplacement refusé : hors limites.");
+                } else {
+                    let cell = &sim_map.map.cells[new_y as usize][new_x as usize];
+                    if *cell == Cell::Obstacle {
+                        println!("Déplacement refusé : obstacle à la case ({}, {}).", new_x, new_y);
+                    } else {
+                        robot.x = new_x;
+                        robot.y = new_y;
+                        println!("Robot {} se déplace en ({}, {})", robot.id, new_x, new_y);
+                    }
+                }
             }
         }
     }
